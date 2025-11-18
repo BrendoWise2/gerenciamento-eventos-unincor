@@ -7,40 +7,156 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/**
+ * ------------------------------
+ * ENUMS
+ * --------------------------------
+ */
+enum Role {
+  ADMIN
+  PARTICIPANTE
+}
+
+enum PresencaStatus {
+  NAO_CONFIRMADO
+  PRESENTE
+  AUSENTE
+}
+
+/**
+ * ------------------------------
+ * USERS / PARTICIPANTES / ADMINS
+ * --------------------------------
+ */
 model User {
-  id                 String     @id @default(uuid())
-  name               String
-  password           String
-  email              String     @unique
-  role               Role       @default(PROFESSOR)
-  email_verified     Boolean    @default(false)
-  verification_token String?
-  cartilha           Cartilha[]
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  cpf       String?   @unique
+  birthDate DateTime?
+  phone     String?
+  course    String? // Apenas se for aluno
+  role      Role      @default(PARTICIPANTE)
+
+  inscriptions Inscription[]
+  certificates Certificate[]
 
   create_at DateTime @default(now())
-  update_at DateTime @default(now())
+  update_at DateTime @updatedAt
 
   @@map("users")
 }
 
-model Cartilha {
-  id        String  @id @default(uuid())
-  title     String
-  author    String
-  pdf       String
-  imageCapa String?
+/**
+ * ------------------------------
+ * PALESTRANTES
+ * --------------------------------
+ */
+model Speaker {
+  id      String  @id @default(uuid())
+  name    String
+  bio     String
+  contact String?
+  photo   String?
 
-  user   User?   @relation(fields: [userId], references: [id])
-  userId String?
+  events EventSpeaker[]
 
-  create_at DateTime @default(now())
-  update_at DateTime @default(now())
-
-  @@map("cartilhas")
+  @@map("speakers")
 }
 
-enum Role {
-  ADMIN
-  PROFESSOR
-  ALUNO
+/**
+ * ------------------------------
+ * CATEGORIA / ÁREA DO EVENTO
+ * --------------------------------
+ */
+model Category {
+  id   String @id @default(uuid())
+  name String @unique
+
+  events Event[]
+
+  @@map("categories")
+}
+
+/**
+ * ------------------------------
+ * EVENTOS
+ * --------------------------------
+ */
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  banner      String?
+  date        DateTime
+  location    String
+  vacancies   Int
+  workload    Int // Carga horária
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  speakers     EventSpeaker[]
+  inscriptions Inscription[]
+  certificates Certificate[]
+
+  create_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  @@map("events")
+}
+
+/**
+ * ------------------------------
+ * TABELA PIVÔ - EVENTO ↔ PALESTRANTE
+ * --------------------------------
+ */
+model EventSpeaker {
+  id        String @id @default(uuid())
+  eventId   String
+  speakerId String
+
+  event   Event   @relation(fields: [eventId], references: [id])
+  speaker Speaker @relation(fields: [speakerId], references: [id])
+
+  @@unique([eventId, speakerId])
+  @@map("event_speakers")
+}
+
+/**
+ * ------------------------------
+ * INSCRIÇÕES (PARTICIPANTE ↔ EVENTO)
+ * --------------------------------
+ */
+model Inscription {
+  id         String         @id @default(uuid())
+  userId     String
+  eventId    String
+  created_at DateTime       @default(now())
+  presence   PresencaStatus @default(NAO_CONFIRMADO)
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId]) // Um inscrito por evento
+  @@map("inscriptions")
+}
+
+/**
+ * ------------------------------
+ * CERTIFICADOS
+ * --------------------------------
+ */
+model Certificate {
+  id        String   @id @default(uuid())
+  userId    String
+  eventId   String
+  code      String   @unique // Identificador único para validação (QR / hash)
+  issued_at DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@map("certificates")
 }
