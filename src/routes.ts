@@ -44,6 +44,12 @@ import { RemoveSpeakerFromEventController } from "./controllers/event_speaker/Re
 import { ListSpeakersByEventController } from "./controllers/event_speaker/ListSpeakersByEventController";
 
 
+// CERTIFICATES
+import { GenerateCertificateController } from "./controllers/certificate/GenerateCertificateController";
+import { GenerateAllCertificatesController } from "./controllers/certificate/GenerateAllCertificatesController";
+import { ValidateCertificateController } from "./controllers/certificate/ValidateCertificateController";
+import { ListUserCertificatesController } from "./controllers/certificate/ListUserCertificatesController";
+
 
 
 
@@ -86,6 +92,19 @@ router.delete("/event/unsubscribe", isAuthenticated, new DeleteInscriptionContro
 router.get("/event/participants", isAuthenticated, new ListParticipantsByEventController().handle);
 router.get("/me/events", isAuthenticated, new ListUserEventsController().handle);
 router.post("/event/presence", isAuthenticated, new MarkPresenceController().handle);
+
+
+// Emitir para 1 usuário
+router.post("/certificate/generate", isAuthenticated, new GenerateCertificateController().handle);
+
+// Emitir para todos presentes no evento
+router.post("/certificate/generateAll", isAuthenticated, new GenerateAllCertificatesController().handle);
+
+// Listar certificados do usuário
+router.get("/me/certificates", isAuthenticated, new ListUserCertificatesController().handle);
+
+// Validar certificado
+router.get("/certificate/validate", new ValidateCertificateController().handle);
 
 //CATEGORIA
 router.post("/createCategory", isAuthenticated, new CreateCategoryController().handle);
