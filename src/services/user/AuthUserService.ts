@@ -22,9 +22,9 @@ class AuthUserService {
             throw new Error("User/Password incorrect");
         }
 
-        if (!user.email_verified) {
-            throw new Error("E-mail não verificado. Verifique sua caixa de entrada.");
-        }
+        //  if (!user.email_verified) {
+        //      throw new Error("E-mail não verificado. Verifique sua caixa de entrada.");
+        //  }
 
         const passwordMatch = await compare(password, user.password);
 

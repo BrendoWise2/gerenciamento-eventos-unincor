@@ -29,7 +29,7 @@ router.get('/listUser', isAuthenticated, new ListUserController().handle);
 router.delete('/deleteUser', isAuthenticated, new DeleteUserController().handle);
 
 //UTIL
-router.get('/verify-email', new VerifyEmailController().handle);
+//router.get('/verify-email', new VerifyEmailController().handle);
 
 //CARTILHA
 router.post('/createCartilha', isAuthenticated, upload.fields([
