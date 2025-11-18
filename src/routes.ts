@@ -26,9 +26,22 @@ import { ListSpeakerController } from "./controllers/speaker/ListSpeakerControll
 import { UpdateSpeakerController } from "./controllers/speaker/UpdateSpeakerController";
 import { DeleteSpeakerController } from "./controllers/speaker/DeleteSpeakerController";
 
+// EVENTO <-> PALESTRANTE
+
+
+// INSCRIPTIONS
+import { CreateInscriptionController } from "./controllers/inscription/CreateInscriptionController";
+import { DeleteInscriptionController } from "./controllers/inscription/DeleteInscriptionController";
+import { ListParticipantsByEventController } from "./controllers/inscription/ListParticipantsByEventController";
+import { ListUserEventsController } from "./controllers/inscription/ListUserEventsController";
+import { MarkPresenceController } from "./controllers/inscription/MarkPresenceController";
+
 
 //CATEGORY
 import { CreateCategoryController } from "./controllers/category/CreateCategoryController";
+import { AddSpeakerToEventController } from "./controllers/event_speaker/AddSpeakerToEventController";
+import { RemoveSpeakerFromEventController } from "./controllers/event_speaker/RemoveSpeakerFromEventController";
+import { ListSpeakersByEventController } from "./controllers/event_speaker/ListSpeakersByEventController";
 
 
 
@@ -60,6 +73,19 @@ router.get("/listAllSpeakers", new ListAllSpeakersController().handle);
 router.get("/listSpeaker", new ListSpeakerController().handle);
 router.put("/updateSpeaker", isAuthenticated, new UpdateSpeakerController().handle);
 router.delete("/deleteSpeaker", isAuthenticated, new DeleteSpeakerController().handle);
+
+//EVENT SPEAKER
+router.post("/event/addSpeaker", isAuthenticated, new AddSpeakerToEventController().handle);
+router.delete("/event/removeSpeaker", isAuthenticated, new RemoveSpeakerFromEventController().handle);
+router.get("/event/speakers", new ListSpeakersByEventController().handle);
+
+
+//INSCRIPTION
+router.post("/event/subscribe", isAuthenticated, new CreateInscriptionController().handle);
+router.delete("/event/unsubscribe", isAuthenticated, new DeleteInscriptionController().handle);
+router.get("/event/participants", isAuthenticated, new ListParticipantsByEventController().handle);
+router.get("/me/events", isAuthenticated, new ListUserEventsController().handle);
+router.post("/event/presence", isAuthenticated, new MarkPresenceController().handle);
 
 //CATEGORIA
 router.post("/createCategory", isAuthenticated, new CreateCategoryController().handle);
