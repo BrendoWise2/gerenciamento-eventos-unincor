@@ -49,6 +49,10 @@ import { GenerateCertificateController } from "./controllers/certificate/Generat
 import { GenerateAllCertificatesController } from "./controllers/certificate/GenerateAllCertificatesController";
 import { ValidateCertificateController } from "./controllers/certificate/ValidateCertificateController";
 import { ListUserCertificatesController } from "./controllers/certificate/ListUserCertificatesController";
+import { GenerateCertificatePDFController } from "./controllers/certificate/GenerateCertificatePDFController";
+
+
+//PDF
 
 
 
@@ -105,6 +109,10 @@ router.get("/me/certificates", isAuthenticated, new ListUserCertificatesControll
 
 // Validar certificado
 router.get("/certificate/validate", new ValidateCertificateController().handle);
+
+//PDF
+router.post("/certificate/pdf", isAuthenticated, new GenerateCertificatePDFController().handle
+);
 
 //CATEGORIA
 router.post("/createCategory", isAuthenticated, new CreateCategoryController().handle);
