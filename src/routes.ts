@@ -13,6 +13,19 @@ import { DetailUserController } from "./controllers/user/DetailUserController";
 import { VerifyEmailService } from "./services/util/VerifyEmailService";
 import { VerifyEmailController } from "./controllers/util/VerifyEmailController";
 
+//EVENTS
+import { CreateEventController } from "./controllers/event/CreateEventController";
+import { ListAllEventsController } from "./controllers/event/ListAllEventsController";
+import { ListEventController } from "./controllers/event/ListEventController";
+import { DeleteEventController } from "./controllers/event/DeleteEventController";
+
+
+//CATEGORIES
+import { CreateCategoryController } from "./controllers/category/CreateCategoryController";
+
+
+
+
 
 export const router = Router();
 
@@ -27,6 +40,16 @@ router.post('/session', new AuthUserController().handle);
 router.get('/listAllUsers', isAuthenticated, new ListAllUsersController().handle);
 router.get('/listUser', isAuthenticated, new ListUserController().handle);
 router.delete('/deleteUser', isAuthenticated, new DeleteUserController().handle);
+
+//EVENT ROUTES
+router.post('/createEvent', isAuthenticated, new CreateEventController().handle);
+router.get('/listAllEvents', new ListAllEventsController().handle);
+router.get('/listEvent', new ListEventController().handle);
+router.delete('/deleteEvent', isAuthenticated, new DeleteEventController().handle);
+
+//CATEGORIA
+router.post("/createCategory", isAuthenticated, new CreateCategoryController().handle);
+
 
 //UTIL
 //router.get('/verify-email', new VerifyEmailController().handle);
