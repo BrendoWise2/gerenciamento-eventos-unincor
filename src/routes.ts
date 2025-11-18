@@ -13,14 +13,21 @@ import { DetailUserController } from "./controllers/user/DetailUserController";
 import { VerifyEmailService } from "./services/util/VerifyEmailService";
 import { VerifyEmailController } from "./controllers/util/VerifyEmailController";
 
-//EVENTS
+//EVENT
 import { CreateEventController } from "./controllers/event/CreateEventController";
 import { ListAllEventsController } from "./controllers/event/ListAllEventsController";
 import { ListEventController } from "./controllers/event/ListEventController";
 import { DeleteEventController } from "./controllers/event/DeleteEventController";
 
+//SPEAKER
+import { CreateSpeakerController } from "./controllers/speaker/CreateSpeakerController";
+import { ListAllSpeakersController } from "./controllers/speaker/ListAllSpeakersController";
+import { ListSpeakerController } from "./controllers/speaker/ListSpeakerController";
+import { UpdateSpeakerController } from "./controllers/speaker/UpdateSpeakerController";
+import { DeleteSpeakerController } from "./controllers/speaker/DeleteSpeakerController";
 
-//CATEGORIES
+
+//CATEGORY
 import { CreateCategoryController } from "./controllers/category/CreateCategoryController";
 
 
@@ -46,6 +53,13 @@ router.post('/createEvent', isAuthenticated, new CreateEventController().handle)
 router.get('/listAllEvents', new ListAllEventsController().handle);
 router.get('/listEvent', new ListEventController().handle);
 router.delete('/deleteEvent', isAuthenticated, new DeleteEventController().handle);
+
+//SPEAKER
+router.post("/createSpeaker", isAuthenticated, new CreateSpeakerController().handle);
+router.get("/listAllSpeakers", new ListAllSpeakersController().handle);
+router.get("/listSpeaker", new ListSpeakerController().handle);
+router.put("/updateSpeaker", isAuthenticated, new UpdateSpeakerController().handle);
+router.delete("/deleteSpeaker", isAuthenticated, new DeleteSpeakerController().handle);
 
 //CATEGORIA
 router.post("/createCategory", isAuthenticated, new CreateCategoryController().handle);
