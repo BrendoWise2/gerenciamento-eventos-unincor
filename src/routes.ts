@@ -2,32 +2,32 @@ import { Router, Request, Response } from "express";
 import { CreateUserController } from "./controllers/user/CreateUserController";
 import { AuthUserController } from "./controllers/user/AuthUserController";
 import { isAuthenticated } from "./middlewares/isAuthenticated";
+import { isAdmin } from "./middlewares/isAdmin";
+
 import { ListAllUsersController } from "./controllers/user/ListAllUsersController";
 import { ListUserController } from "./controllers/user/ListUserController";
 import { DeleteUserController } from "./controllers/user/DeleteUserController";
-import { CreateCartilhaController } from "./controllers/cartilha/CreateCartilhaController";
-import { ListAllCartilhasController } from "./controllers/cartilha/ListAllCartilhasController";
-import { ListCartilhasController } from "./controllers/cartilha/ListCartilhasController";
+
 import { upload } from "./config/multer";
 import { DetailUserController } from "./controllers/user/DetailUserController";
-import { VerifyEmailService } from "./services/util/VerifyEmailService";
-import { VerifyEmailController } from "./controllers/util/VerifyEmailController";
 
-//EVENT
+// EVENT
 import { CreateEventController } from "./controllers/event/CreateEventController";
 import { ListAllEventsController } from "./controllers/event/ListAllEventsController";
 import { ListEventController } from "./controllers/event/ListEventController";
 import { DeleteEventController } from "./controllers/event/DeleteEventController";
 
-//SPEAKER
+// SPEAKER
 import { CreateSpeakerController } from "./controllers/speaker/CreateSpeakerController";
 import { ListAllSpeakersController } from "./controllers/speaker/ListAllSpeakersController";
 import { ListSpeakerController } from "./controllers/speaker/ListSpeakerController";
 import { UpdateSpeakerController } from "./controllers/speaker/UpdateSpeakerController";
 import { DeleteSpeakerController } from "./controllers/speaker/DeleteSpeakerController";
 
-// EVENTO <-> PALESTRANTE
-
+// EVENT SPEAKER
+import { AddSpeakerToEventController } from "./controllers/event_speaker/AddSpeakerToEventController";
+import { RemoveSpeakerFromEventController } from "./controllers/event_speaker/RemoveSpeakerFromEventController";
+import { ListSpeakersByEventController } from "./controllers/event_speaker/ListSpeakersByEventController";
 
 // INSCRIPTIONS
 import { CreateInscriptionController } from "./controllers/inscription/CreateInscriptionController";
@@ -36,13 +36,8 @@ import { ListParticipantsByEventController } from "./controllers/inscription/Lis
 import { ListUserEventsController } from "./controllers/inscription/ListUserEventsController";
 import { MarkPresenceController } from "./controllers/inscription/MarkPresenceController";
 
-
-//CATEGORY
+// CATEGORY
 import { CreateCategoryController } from "./controllers/category/CreateCategoryController";
-import { AddSpeakerToEventController } from "./controllers/event_speaker/AddSpeakerToEventController";
-import { RemoveSpeakerFromEventController } from "./controllers/event_speaker/RemoveSpeakerFromEventController";
-import { ListSpeakersByEventController } from "./controllers/event_speaker/ListSpeakersByEventController";
-
 
 // CERTIFICATES
 import { GenerateCertificateController } from "./controllers/certificate/GenerateCertificateController";
@@ -51,81 +46,89 @@ import { ValidateCertificateController } from "./controllers/certificate/Validat
 import { ListUserCertificatesController } from "./controllers/certificate/ListUserCertificatesController";
 import { GenerateCertificatePDFController } from "./controllers/certificate/GenerateCertificatePDFController";
 
-
-//PDF
-
-
-
+// CARTILHA
+import { CreateCartilhaController } from "./controllers/cartilha/CreateCartilhaController";
+import { ListAllCartilhasController } from "./controllers/cartilha/ListAllCartilhasController";
+import { ListCartilhasController } from "./controllers/cartilha/ListCartilhasController";
 
 export const router = Router();
 
-router.post("/teste", (req: Request, res: Response) => {
+// ======================================
+// USERS (ADMIN)
+// ======================================
+router.post('/createUser', isAuthenticated, isAdmin, new CreateUserController().handle);
+router.get('/listAllUsers', isAuthenticated, isAdmin, new ListAllUsersController().handle);
+router.delete('/deleteUser', isAuthenticated, isAdmin, new DeleteUserController().handle);
 
-    throw new Error("Erro ao fazer a requisicao");
-});
-
-//USER
-router.post('/createUser', new CreateUserController().handle);
+// LOGIN
 router.post('/session', new AuthUserController().handle);
-router.get('/listAllUsers', isAuthenticated, new ListAllUsersController().handle);
-router.get('/listUser', isAuthenticated, new ListUserController().handle);
-router.delete('/deleteUser', isAuthenticated, new DeleteUserController().handle);
 
-//EVENT ROUTES
-router.post('/createEvent', isAuthenticated, new CreateEventController().handle);
+// Perfil próprio
+router.get('/listUser', isAuthenticated, new ListUserController().handle);
+router.get('/me', isAuthenticated, new DetailUserController().handle);
+
+// ======================================
+// EVENTOS
+// ======================================
+router.post('/createEvent', isAuthenticated, isAdmin, new CreateEventController().handle);
+router.delete('/deleteEvent', isAuthenticated, isAdmin, new DeleteEventController().handle);
+
 router.get('/listAllEvents', new ListAllEventsController().handle);
 router.get('/listEvent', new ListEventController().handle);
-router.delete('/deleteEvent', isAuthenticated, new DeleteEventController().handle);
 
-//SPEAKER
-router.post("/createSpeaker", isAuthenticated, new CreateSpeakerController().handle);
+// ======================================
+// SPEAKERS (ADMIN)
+// ======================================
+router.post("/createSpeaker", isAuthenticated, isAdmin, new CreateSpeakerController().handle);
+router.put("/updateSpeaker", isAuthenticated, isAdmin, new UpdateSpeakerController().handle);
+router.delete("/deleteSpeaker", isAuthenticated, isAdmin, new DeleteSpeakerController().handle);
+
+// Públicos
 router.get("/listAllSpeakers", new ListAllSpeakersController().handle);
 router.get("/listSpeaker", new ListSpeakerController().handle);
-router.put("/updateSpeaker", isAuthenticated, new UpdateSpeakerController().handle);
-router.delete("/deleteSpeaker", isAuthenticated, new DeleteSpeakerController().handle);
 
-//EVENT SPEAKER
-router.post("/event/addSpeaker", isAuthenticated, new AddSpeakerToEventController().handle);
-router.delete("/event/removeSpeaker", isAuthenticated, new RemoveSpeakerFromEventController().handle);
+// ======================================
+// EVENT <-> SPEAKER (ADMIN)
+// ======================================
+router.post("/event/addSpeaker", isAuthenticated, isAdmin, new AddSpeakerToEventController().handle);
+router.delete("/event/removeSpeaker", isAuthenticated, isAdmin, new RemoveSpeakerFromEventController().handle);
+
+// Público
 router.get("/event/speakers", new ListSpeakersByEventController().handle);
 
-
-//INSCRIPTION
+// ======================================
+// INSCRIÇÕES (Usuário comum)
+// ======================================
 router.post("/event/subscribe", isAuthenticated, new CreateInscriptionController().handle);
 router.delete("/event/unsubscribe", isAuthenticated, new DeleteInscriptionController().handle);
-router.get("/event/participants", isAuthenticated, new ListParticipantsByEventController().handle);
+router.get("/event/participants", isAuthenticated, isAdmin, new ListParticipantsByEventController().handle);
 router.get("/me/events", isAuthenticated, new ListUserEventsController().handle);
-router.post("/event/presence", isAuthenticated, new MarkPresenceController().handle);
+router.post("/event/presence", isAuthenticated, isAdmin, new MarkPresenceController().handle);
 
+// ======================================
+// CATEGORIAS (ADMIN)
+// ======================================
+router.post("/createCategory", isAuthenticated, isAdmin, new CreateCategoryController().handle);
 
-// Emitir para 1 usuário
-router.post("/certificate/generate", isAuthenticated, new GenerateCertificateController().handle);
+// ======================================
+// CERTIFICADOS
+// ======================================
+router.post("/certificate/generate", isAuthenticated, isAdmin, new GenerateCertificateController().handle);
+router.post("/certificate/generateAll", isAuthenticated, isAdmin, new GenerateAllCertificatesController().handle);
 
-// Emitir para todos presentes no evento
-router.post("/certificate/generateAll", isAuthenticated, new GenerateAllCertificatesController().handle);
+router.post("/certificate/pdf", isAuthenticated, isAdmin, new GenerateCertificatePDFController().handle);
 
-// Listar certificados do usuário
+// Público
 router.get("/me/certificates", isAuthenticated, new ListUserCertificatesController().handle);
-
-// Validar certificado
 router.get("/certificate/validate", new ValidateCertificateController().handle);
 
-//PDF
-router.post("/certificate/pdf", isAuthenticated, new GenerateCertificatePDFController().handle
-);
-
-//CATEGORIA
-router.post("/createCategory", isAuthenticated, new CreateCategoryController().handle);
-
-
-//UTIL
-//router.get('/verify-email', new VerifyEmailController().handle);
-
-//CARTILHA
-router.post('/createCartilha', isAuthenticated, upload.fields([
+// ======================================
+// CARTILHA (ADMIN cria, público vê)
+// ======================================
+router.post('/createCartilha', isAuthenticated, isAdmin, upload.fields([
     { name: "pdfFile", maxCount: 1 },
     { name: "imageFile", maxCount: 1 },
 ]), new CreateCartilhaController().handle);
+
 router.get('/listAllCartilhas', new ListAllCartilhasController().handle);
 router.get('/listCartilhas', new ListCartilhasController().handle);
-router.get('/me', isAuthenticated, new DetailUserController().handle)
